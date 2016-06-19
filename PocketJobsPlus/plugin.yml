@@ -5,4 +5,4 @@ api: [1.13.0, 2.0.0]
 load: POSTWORLD
 author: popkechupki
 description: "PocketMoneyに対応した職業プラグイン。"
-web: "http://github.com/PocketJobsPlus"
+web: "http://github.com/popkechupki/PocketJobsPlus"
