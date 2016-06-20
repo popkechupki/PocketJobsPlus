@@ -1,5 +1,7 @@
 <?php
-
+/*
+現在製作中。このsrcは動作しません。.pharを使用してください。
+*/
 namespace popkechupki;
 
 //server
@@ -14,6 +16,9 @@ use pocketmine\plugin\PluginBase;
 //event
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
+
+//command
+use pocketmine\command\Command;
 
 //another
 use pocketmine\utils\TextFormat;
@@ -41,6 +46,16 @@ class PocketJobsPlus extends PluginBase implements Listener {
     $this->getServer()->getPluginManager()->registerEvents($this,$this);
 	}
 
+	public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+		if($command->getName() =="cash"){
+			switch (strtolower(array_shift($args))){
+				case 'info':
+					//処理
+				break;
+			}
+		}
+	}
+	
 	public function onPlayerlockBreak(BlockBreakEvent $event) {
 		$user = $event->getPlayer()->getName();
 			switch ($event->getBlock()->getId()) {
