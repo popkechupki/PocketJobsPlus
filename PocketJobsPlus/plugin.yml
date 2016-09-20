@@ -1,6 +1,6 @@
 name: PocketJobsPlus
 main: popkechupki\PocketJobsPlus
-version: 0.1.2.PocketMoney
+version: 0.1.3.PocketMoney
 api: [1.13.0, 2.0.0]
 load: POSTWORLD
 author: popkechupki
