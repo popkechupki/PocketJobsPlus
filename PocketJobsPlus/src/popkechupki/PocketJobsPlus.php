@@ -1,161 +1,102 @@
 <?php
-/*
-現在製作中。このsrcは動作しません。.pharを使用してください。
-*/
+
 namespace popkechupki;
 
-//server
-use pocketmine\Server;
-
-//player
 use pocketmine\Player;
-
-//plugin
 use pocketmine\plugin\PluginBase;
-
-//event
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
-
-//command
-use pocketmine\command\Command;
-
-//another
+use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\block\Block;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Config;
 
 class PocketJobsPlus extends PluginBase implements Listener {
 
-	public function onEnable() {                                       
-    $this->getLogger()->info(TextFormat::GREEN."PocketJobsPlusを読み込みました".TextFormat::GOLD." By popkechupki");
-    $this->getLogger()->info(TextFormat::RED."このプラグインはpopke LICENSEに同意した上で使用してください。");
-    if (!file_exists($this->getDataFolder())) @mkdir($this->getDataFolder(), 0741, true);
-        $this->break = new Config($this->getDataFolder() . "break.yml", Config::YAML,
-                    array(
-                        '焼き石(1)'=>'2', '草ブロック(2)'=>'2', '土(3)'=>'2', '丸石(4)'=>'10', '木材(5)'=>'10', '砂(12)'=>'2', '砂利(13)'=>'2', '金鉱石(14)'=>'30', '鉄鉱石(15)'=>'30', '石炭鉱石(16)'=>'20', '原木(17)'=>'20', '葉ブロック(18)'=>'2', 'ラピスラズリ鉱石(21)'=>'25', '砂岩(24)'=>'10', 'ダイアモンド鉱石(56)'=>'100', '小麦(59)'=>'5', 'レッドストーン鉱石(73)'=>'25', '雪ブロック(80)'=>'10', '粘土(82)'=>'2', 'かぼちゃ(86)'=>'5', 'ネザーラック(87)'=>'2', 'ソウルサンド(88)'=>'2', 'グロウストーン(89)'=>'25', 'スイカ(103)'=>'2'
-                        ));
+	function onEnable() {   
+        $this->getServer()->getPluginManager()->registerEvents($this,$this);
+    /*Default Messages*/
+        $this->getLogger()->info(TextFormat::GREEN."PocketJobsPlusを読み込みました！");
+        $this->getLogger()->info(TextFormat::RED."このプラグインはpopke LICENSEに同意した上で使用してください。");
+    /*Create Config Files*/
+        if (!file_exists($this->getDataFolder())) @mkdir($this->getDataFolder(), 0740, true);
+        $this->break = new Config($this->getDataFolder()."break.yml", Config::YAML, 
+            array(
+                'setting' => array('meta' => false),
+                Block::STONE => array('name' => '焼き石', 'meta' => 0, 'amount' => 2 ),
+                Block::GRASS => array('name' => '草ブロック', 'meta' => 0, 'amount' => 2 ),
+                Block::DIRT => array('name' => '土', 'meta' => 0, 'amount' => 2 ),
+                Block::COBBLESTONE => array('name' => '丸石', 'meta' => 0, 'amount' => 10 ),
+                Block::PLANK => array('name' => '木材', 'meta' => 0, 'amount' => 10 ),
+                Block::SAND => array('name' => '砂', 'meta' => 0, 'amount' => 2 ),
+                Block::GRAVEL => array('name' => '砂利', 'meta' => 0, 'amount' => 2 ),
+                Block::GOLD_ORE => array('name' => '金鉱石', 'meta' => 0, 'amount' => 30 ),
+                Block::IRON_ORE => array('name' => '鉄鉱石', 'meta' => 0, 'amount' => 30 ),
+                Block::COAL_ORE => array('name' => '石炭鉱石', 'meta' => 0, 'amount' => 20 ),
+                Block::WOOD => array('name' => '原木', 'meta' => 0, 'amount' => 20 ),
+                Block::LEAVES => array('name' => '葉ブロック', 'meta' => 0, 'amount' => 2 ),
+                Block::LAPIS_ORE => array('name' => 'ラピスラズリ鉱石', 'meta' => 0, 'amount' => 25 ),
+                Block::SANDSTONE => array('name' => '砂岩', 'meta' => 0, 'amount' => 10 ),
+                Block::DIAMOND_ORE => array('name' =>'ダイヤモンド鉱石', 'meta' => 0, 'amount' => 100 ),
+                Block::WHEAT_BLOCK => array('name' => '小麦', 'meta' => 0, 'amount' => 5 ),
+                Block::REDSTONE_ORE => array('name' => 'レッドストーン鉱石', 'meta' => 0, 'amount' => 25 ),
+                Block::SNOW_BLOCK => array('name' => '雪ブロック', 'meta' => 0, 'amount' => 10 ),
+                Block::CLAY_BLOCK => array('name' => '粘土ブロック', 'meta' => 0, 'amount' => 5 ),
+                Block::PUMPKIN => array('name' => 'かぼちゃ', 'meta' => 0, 'amount' => 5 ),
+                Block::NETHERRACK => array('name' => 'ネザーラック', 'meta' => 0, 'amount' => 2 ),
+                Block::SOUL_SAND => array('name' => 'ソウルサンド', 'meta' => 0, 'amount' => 2 ),
+                Block::GLOWSTONE => array('name' => 'グロウストーン', 'meta' => 0, 'amount' => 25 ),
+                Block::MELON_STEM => array('name' => 'スイカブロック', 'meta' => 0, 'amount' => 2 )
+            ));
+        $this->break->save();
+        $this->place = new Config($this->getDataFolder()."place.yml", Config::YAML, 
+            array(
+                'setting' => array('meta' => false),
+                Block::SAPLING => array('name' => '苗木', 'meta' => 0, 'amount' => 2 ),
+                Block::WHEAT_BLOCK => array('name' => '小麦', 'meta' => 0, 'amount' => 2 ),
+                Block::SUGARCANE_BLOCK => array('name' => 'さとうきび', 'meta' => 0, 'amount' => 2 )
+                ));
+         $this->place->save();
     /*EconomyAPI Road*/
-    if($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") != null){
+        if ($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") != null) {
             $this->EconomyAPI = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI");
-            $this->getLogger()->info("EconomyAPIを検出しました。");
-        }else{
-            $this->getLogger()->warning("EconomyAPIが見つかりませんでした");
+        } else {
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
-    $this->break->save();
-    $this->getServer()->getPluginManager()->registerEvents($this,$this);
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, $label, array $args){
-		if($command->getName() =="cash"){
-			switch (strtolower(array_shift($args))){
-				case 'info':
-					//処理
-				break;
-			}
-		}
+	function onPlayerBlockBreak(BlockBreakEvent $event) {
+		$user = $event->getPlayer()->getName();
+        $bid = $event->getBlock()->getId();
+        $bd = $event->getBlock()->getDamage();
+        $cmeta = $this->break->getAll()['setting'];
+        if ($this->break->exists($bid)) {
+            $breaky = $this->break->getAll()[$bid];
+            if ($cmeta = 'ture') {
+                if ($bd == $breaky["meta"]) {
+                    $this->EconomyAPI->addMoney($user, +$breaky["amount"]);
+                }
+            } else {
+                $this->EconomyAPI->addMoney($user, +$breaky["amount"]);
+            }
+        }
 	}
 	
-	public function onPlayerlockBreak(BlockBreakEvent $event) {
-		$user = $event->getPlayer()->getName();
-			switch ($event->getBlock()->getId()) {
-				case"1":
-                    $prize = $this->break->get("焼き石(1)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"2":
-                    $prize = $this->break->get("草ブロック(2)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"3":
-                    $prize = $this->break->get("土(3)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"4":
-                    $prize = $this->break->get("丸石(4)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"5":
-                    $prize = $this->break->get("木材(5)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"12":
-                    $prize = $this->break->get("砂(12)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"13":
-                    $prize = $this->break->get("砂利(13)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"14":
-                    $prize = $this->break->get("金鉱石(14)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"15":
-                    $prize = $this->break->get("鉄鉱石(15)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"16":
-                    $prize = $this->break->get("石炭鉱石(16)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"17":
-                    $prize = $this->break->get("原木(17)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"18":
-                    $prize = $this->break->get("葉ブロック(18)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"21":
-                    $prize = $this->break->get("ラピスラズリ鉱石(21)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"24":
-                    $prize = $this->break->get("砂岩(24)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"56":
-                    $prize = $this->break->get("ダイアモンド鉱石(56)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"59":
-                    $prize = $this->break->get("小麦(59)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"73":
-                case"74":
-                    $prize = $this->break->get("レッドストーン鉱石(73)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"80":
-                    $prize = $this->break->get("雪ブロック(80)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"82":
-                    $prize = $this->break->get("粘土(82)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"86":
-                    $prize = $this->break->get("かぼちゃ(86)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"87":
-                    $prize = $this->break->get("ネザーラック(87)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"88":
-                    $prize = $this->break->get("ソウルサンド(88)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"89":
-                    $prize = $this->break->get("グロウストーン(89)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-                case"103":
-                    $prize = $this->break->get("スイカ(103)");
-                    $this->EconomyAPI->addMoney($user, +$prize);
-                break;
-			}
-	}
+    function onPlayerBlockPlace(BlockPlaceEvent $event) {
+        $user = $event->getPlayer()->getName();
+        $bid = $event->getBlock()->getId();
+        $bd = $event->getBlock()->getDamage();
+        $cmeta = $this->place->getAll()['setting'];
+        if ($this->place->exists($bid)) {
+            $placey = $this->place->getAll()[$bid];
+            if ($cmeta = 'ture') {
+                if ($bd == $placey["meta"]) {
+                    $this->EconomyAPI->addMoney($user, +$placey["amount"]);
+                }
+            } else {
+                $this->EconomyAPI->addMoney($user, +$placey["amount"]);
+            }
+        }
+    }
+
 }
