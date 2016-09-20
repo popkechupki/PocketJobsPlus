@@ -6,12 +6,15 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\block\Block;
+use pocketmine\event\player\PlayerItemConsumeEvent;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Config;
 
 class PocketJobsPlus extends PluginBase implements Listener {
 
-	public function onEnable() {   
+	function onEnable() {   
         $this->getServer()->getPluginManager()->registerEvents($this,$this);
     /*Default Messages*/
         $this->getLogger()->info(TextFormat::GREEN."PocketJobsPlusを読み込みました！");
@@ -20,33 +23,41 @@ class PocketJobsPlus extends PluginBase implements Listener {
         if (!file_exists($this->getDataFolder())) @mkdir($this->getDataFolder(), 0740, true);
         $this->break = new Config($this->getDataFolder()."break.yml", Config::YAML, 
             array(
-                '1' => array('name' => '焼き石', 'meta' => 0, 'amount' => 2 ),
-                '2' => array('name' => '草ブロック', 'meta' => 0, 'amount' => 2 ),
-                '3' => array('name' => '土', 'meta' => 0, 'amount' => 2 ),
-                '4' => array('name' => '丸石', 'meta' => 0, 'amount' => 10 ),
-                '5' => array('name' => '木材', 'meta' => 0, 'amount' => 10 ),
-                '12' => array('name' => '砂', 'meta' => 0, 'amount' => 2 ),
-                '13' => array('name' => '砂利', 'meta' => 0, 'amount' => 2 ),
-                '14' => array('name' => '金鉱石', 'meta' => 0, 'amount' => 30 ),
-                '15' => array('name' => '鉄鉱石', 'meta' => 0, 'amount' => 30 ),
-                '16' => array('name' => '石炭鉱石', 'meta' => 0, 'amount' => 20 ),
-                '17' => array('name' => '原木', 'meta' => 0, 'amount' => 20 ),
-                '18' => array('name' => '葉ブロック', 'meta' => 0, 'amount' => 2 ),
-                '21' => array('name' => 'ラピスラズリ鉱石', 'meta' => 0, 'amount' => 25 ),
-                '24' => array('name' => '砂岩', 'meta' => 0, 'amount' => 10 ),
-                '56' => array('name' => 'ダイヤモンド鉱石', 'meta' => 0, 'amount' => 100 ),
-                '59' => array('name' => '小麦', 'meta' => 0, 'amount' => 5 ),
-                '73' => array('name' => 'レッドストーン鉱石', 'meta' => 0, 'amount' => 25 ),
-                '80' => array('name' => '雪ブロック', 'meta' => 0, 'amount' => 10 ),
-                '82' => array('name' => '粘土ブロック', 'meta' => 0, 'amount' => 5 ),
-                '86' => array('name' => 'かぼちゃ', 'meta' => 0, 'amount' => 5 ),
-                '87' => array('name' => 'ネザーラック', 'meta' => 0, 'amount' => 2 ),
-                '88' => array('name' => 'ソウルサンド', 'meta' => 0, 'amount' => 2 ),
-                '89' => array('name' => 'グロウストーン', 'meta' => 0, 'amount' => 25 ),
-                '103' => array('name' => 'スイカブロック', 'meta' => 0, 'amount' => 2 )
+                'setting' => array('meta' => false),
+                Block::STONE => array('name' => '焼き石', 'meta' => 0, 'amount' => 2 ),
+                Block::GRASS => array('name' => '草ブロック', 'meta' => 0, 'amount' => 2 ),
+                Block::DIRT => array('name' => '土', 'meta' => 0, 'amount' => 2 ),
+                Block::COBBLESTONE => array('name' => '丸石', 'meta' => 0, 'amount' => 10 ),
+                Block::PLANK => array('name' => '木材', 'meta' => 0, 'amount' => 10 ),
+                Block::SAND => array('name' => '砂', 'meta' => 0, 'amount' => 2 ),
+                Block::GRAVEL => array('name' => '砂利', 'meta' => 0, 'amount' => 2 ),
+                Block::GOLD_ORE => array('name' => '金鉱石', 'meta' => 0, 'amount' => 30 ),
+                Block::IRON_ORE => array('name' => '鉄鉱石', 'meta' => 0, 'amount' => 30 ),
+                Block::COAL_ORE => array('name' => '石炭鉱石', 'meta' => 0, 'amount' => 20 ),
+                Block::WOOD => array('name' => '原木', 'meta' => 0, 'amount' => 20 ),
+                Block::LEAVES => array('name' => '葉ブロック', 'meta' => 0, 'amount' => 2 ),
+                Block::LAPIS_ORE => array('name' => 'ラピスラズリ鉱石', 'meta' => 0, 'amount' => 25 ),
+                Block::SANDSTONE => array('name' => '砂岩', 'meta' => 0, 'amount' => 10 ),
+                Block::DIAMOND_ORE => array('name' =>'ダイヤモンド鉱石', 'meta' => 0, 'amount' => 100 ),
+                Block::WHEAT_BLOCK => array('name' => '小麦', 'meta' => 0, 'amount' => 5 ),
+                Block::REDSTONE_ORE => array('name' => 'レッドストーン鉱石', 'meta' => 0, 'amount' => 25 ),
+                Block::SNOW_BLOCK => array('name' => '雪ブロック', 'meta' => 0, 'amount' => 10 ),
+                Block::CLAY_BLOCK => array('name' => '粘土ブロック', 'meta' => 0, 'amount' => 5 ),
+                Block::PUMPKIN => array('name' => 'かぼちゃ', 'meta' => 0, 'amount' => 5 ),
+                Block::NETHERRACK => array('name' => 'ネザーラック', 'meta' => 0, 'amount' => 2 ),
+                Block::SOUL_SAND => array('name' => 'ソウルサンド', 'meta' => 0, 'amount' => 2 ),
+                Block::GLOWSTONE => array('name' => 'グロウストーン', 'meta' => 0, 'amount' => 25 ),
+                Block::MELON_STEM => array('name' => 'スイカブロック', 'meta' => 0, 'amount' => 2 )
             ));
         $this->break->save();
-        $this->paste = new Config($this->getDataFolder()."paste.yml", Config::YAML);
+        $this->place = new Config($this->getDataFolder()."place.yml", Config::YAML, 
+            array(
+                'setting' => array('meta' => false),
+                Block::SAPLING => array('name' => '苗木', 'meta' => 0, 'amount' => 2 ),
+                Block::WHEAT_BLOCK => array('name' => '小麦', 'meta' => 0, 'amount' => 2 ),
+                Block::SUGARCANE_BLOCK => array('name' => 'さとうきび', 'meta' => 0, 'amount' => 2 )
+                ));
+         $this->place->save();
     /*PocketMoneyAPI Road*/
         if ($this->getServer()->getPluginManager()->getPlugin("PocketMoney") != null) {
             $this->PocketMoney = $this->getServer()->getPluginManager()->getPlugin("PocketMoney");
@@ -55,16 +66,42 @@ class PocketJobsPlus extends PluginBase implements Listener {
         }
 	}
 
-	public function onPlayerlockBreak(BlockBreakEvent $event) {
+	function onPlayerBlockBreak(BlockBreakEvent $event) {
 		$user = $event->getPlayer()->getName();
         $bid = $event->getBlock()->getId();
         $bd = $event->getBlock()->getDamage();
-        $all = $this->break->getAll()[$bid];
+        $cmeta = $this->break->getAll()['setting'];
         if ($this->break->exists($bid)) {
-            if ($bd == $all["meta"]) {
-                $this->PocketMoney->grantMoney($user, + $all["amount"]);
+            $breaky = $this->break->getAll()[$bid];
+            if ($cmeta = 'ture') {
+                if ($bd == $breaky["meta"]) {
+                    $this->addMoney($user, $breaky["amount"]);
+                }
+            } else {
+                $this->addMoney($user, $breaky["amount"]);
             }
         }
 	}
+	
+    function onPlayerBlockPlace(BlockPlaceEvent $event) {
+        $user = $event->getPlayer()->getName();
+        $bid = $event->getBlock()->getId();
+        $bd = $event->getBlock()->getDamage();
+        $cmeta = $this->place->getAll()['setting'];
+        if ($this->place->exists($bid)) {
+            $placey = $this->place->getAll()[$bid];
+            if ($cmeta = 'ture') {
+                if ($bd == $placey["meta"]) {
+                    $this->addMoney($user, $placey["amount"]);
+                }
+            } else {
+                $this->addMoney($user, $placey["amount"]);
+            }
+        }
+    }
+
+    function addMoney($user, $amount) {
+        $this->PocketMoney->grantMoney($user, $amount);
+    }
 
 }
