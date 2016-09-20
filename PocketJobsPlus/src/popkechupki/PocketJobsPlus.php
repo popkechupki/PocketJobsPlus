@@ -8,7 +8,6 @@ use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\block\Block;
-use pocketmine\event\player\PlayerItemConsumeEvent;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Config;
 
