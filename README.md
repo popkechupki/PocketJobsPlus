@@ -1,7 +1,6 @@
 # PocketJobsPlus
-PocketMine-MPのPocketMoneyと連携する職業プラグインです。  
+PocketMine-MPのPocketMoney, EconomyAPIと連携する職業プラグインです。  
 使用する際には以下のライセンスに同意した上での使用をお願いします。  
-このプラグインはPocketMoneyとEconomyAPIに対応しています。
 ##popke LICENSE
 1.プラグインをサーバーで使用したとき、起動時にこのライセンスのことについて書かれている場合とGitHubにアップッロードされているプラグインを使用するときは、このライセンスに同意した上でこのプラグインを使用して下さい。
 
