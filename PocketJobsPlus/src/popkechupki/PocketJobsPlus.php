@@ -59,7 +59,7 @@ class PocketJobsPlus extends PluginBase implements Listener {
          $this->place->save();
     /*PocketMoneyAPI Road*/
         if ($this->getServer()->getPluginManager()->getPlugin("AmberMoney") != null) {
-            $this->PocketMoney = $this->getServer()->getPluginManager()->getPlugin("AmberMoney");
+            $this->AmberMoney = $this->getServer()->getPluginManager()->getPlugin("AmberMoney");
         } else {
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
@@ -100,7 +100,7 @@ class PocketJobsPlus extends PluginBase implements Listener {
     }
 
     function addMoney($user, $amount) {
-        $this->PocketMoney->grantMoney($user, $amount);
+        $this->AmberMoney->addMoney($user, $amount);
     }
 
 }
